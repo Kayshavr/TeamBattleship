@@ -3,14 +3,14 @@ import java.awt.Point;
 import java.util.Vector;
 
 @SuppressWarnings("serial")
-public class Player implements java.io.Serializable{
+public class Player extends User implements java.io.Serializable {
 
 	public static int rows = 10;
 	public static int columns = 10;
 	private int playerField[][];
 	private Ship playerShips[];
 	private String playerName;
-	
+
 	public Player(String name)
 	{
 		playerName = name;
