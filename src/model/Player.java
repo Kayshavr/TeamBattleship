@@ -5,8 +5,8 @@ import java.util.Vector;
 @SuppressWarnings("serial")
 public class Player implements java.io.Serializable{
 
-	public static int rows = 10;
-	public static int columns = 10;
+	public int rows = 10;
+	public int columns = 10;
 	private int playerField[][];
 	private Ship playerShips[];
 	private String playerName;

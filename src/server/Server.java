@@ -8,18 +8,48 @@ import model.Message;
 import model.Player;
 import model.Shot;
 
-public class Server {
-	private static int PORT;
+public class Server extends Thread {
+	private int PORT;
 	
-	public static ArrayList<ClientHandler> clients = new ArrayList<>();
-	public static ArrayList<Player> players = new ArrayList<>();
+	public ArrayList<ClientHandler> clients = new ArrayList<>();
+	public ArrayList<Player> players = new ArrayList<>();
 	
-	public static Player currentTurn;
-	public static boolean gameStarted = false;
-	public static boolean playersConnected = false;
+	public Player currentTurn;
+	public boolean gameStarted = false;
+	public boolean playersConnected = false;
 	
-	
-	public static Message processShot(Shot shot)
+	public Server(int PORT) throws IOException {
+		this.PORT = PORT;
+
+	}
+
+	@Override
+	public void run(){
+
+		try {
+			ServerSocket listener = new ServerSocket(this.PORT);
+			System.out.println("Server running. Waiting for connections...");
+
+			try {
+				// Gaida klientu savienojumus
+				while (true) {
+					Socket client = listener.accept();
+					System.out.println("New client connected");
+
+					// Izveido un saak clientHandler thread
+					ClientHandler clientThread = new ClientHandler(client, this);
+					clients.add(clientThread);
+					clientThread.start();
+				}
+			} finally {
+				listener.close();
+			}
+		}catch (IOException e){
+			System.out.println("Noooooo!");
+		}
+	}
+
+	public Message processShot(Shot shot)
 	{
 		Message message = new Message();
 		Player enemy = null;
@@ -27,8 +57,8 @@ public class Server {
 		boolean sink = false;
 		boolean victory = false;
 		
-		for (Player p : Server.players)
-			if(!p.equals(Server.currentTurn))
+		for (Player p : this.players)
+			if(!p.equals(this.currentTurn))
 				enemy = p;
 		
 		
@@ -38,7 +68,7 @@ public class Server {
 		{
 			// Miss
 			hit = false;
-			Server.currentTurn = enemy;
+			this.currentTurn = enemy;
 		}
 		else
 		{
@@ -56,7 +86,7 @@ public class Server {
 		}
 		
 		message.setShot(shot);
-		message.setNextTurn(Server.currentTurn.getPlayerName());
+		message.setNextTurn(this.currentTurn.getPlayerName());
 		message.setHit(hit);
 		message.setSink(sink);
 		message.setVictory(victory);
@@ -65,17 +95,17 @@ public class Server {
 	}
 	
 
-	public static void main(String[] args) throws IOException {
-		
+	public void main(String[] args) throws IOException {
+		this.PORT  = 8989;
 		// Ja nav noradits porta nr. tad uzstada default port.
 		if(args.length < 1)
-			PORT = 8989;
+			this.PORT = 8989;
 		else
-			PORT = Integer.parseInt(args[0]);
+			this.PORT = Integer.parseInt(args[0]);
 		
 		
 		
-		ServerSocket listener = new ServerSocket(PORT);
+		ServerSocket listener = new ServerSocket(this.PORT);
 		System.out.println("Server running. Waiting for connections...");
 		
 		try
@@ -87,7 +117,7 @@ public class Server {
 				System.out.println("New client connected");
 				
 				// Izveido un saak clientHandler thread
-				ClientHandler clientThread = new ClientHandler(client);
+				ClientHandler clientThread = new ClientHandler(client, this);
 				clients.add(clientThread);
 				clientThread.start();
 			}

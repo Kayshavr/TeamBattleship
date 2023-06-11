@@ -17,9 +17,12 @@ public class ClientHandler extends Thread {
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
 
+	private Server server;
+
 	
-	public ClientHandler(Socket clientSocket)
+	public ClientHandler(Socket clientSocket, Server server)
 	{
+		this.server = server;
 		try
 		{
 			this.client = clientSocket;
@@ -36,7 +39,7 @@ public class ClientHandler extends Thread {
 	
 	public void broadcast(Object message)
 	{
-		for (ClientHandler clientHandler : Server.clients) {
+		for (ClientHandler clientHandler : this.server.clients) {
 			try
 			{
 				clientHandler.getObjectWriter().writeObject(message);
@@ -55,32 +58,32 @@ public class ClientHandler extends Thread {
 	
 	public void checkClientCount()
 	{
-		if(Server.clients.size() < 2)
+		if(this.server.clients.size() < 2)
 		{
 			broadcast("wait");
 		}
 		else
 		{
-			Server.playersConnected = true;
+			this.server.playersConnected = true;
 			broadcast("playersConnected");
 		}
 	}
 	
 	public void checkPlayerCount()
 	{
-		if(Server.players.size() < 2)
+		if(this.server.players.size() < 2)
 		{
 			broadcast("wait");
 		}
 		else
 		{
 			broadcast("playersReady");
-			Server.gameStarted = true;
+			this.server.gameStarted = true;
 			
 			// The player who filled his field first will start the game first
-			Server.currentTurn = Server.players.get(0);
+			this.server.currentTurn = this.server.players.get(0);
 			Message msg = new Message();
-			msg.setNextTurn(Server.players.get(0).getPlayerName());
+			msg.setNextTurn(this.server.players.get(0).getPlayerName());
 			msg.setShot(null);
 			msg.setShip(null);
 			broadcast(msg);			
@@ -89,7 +92,7 @@ public class ClientHandler extends Thread {
 	
 	public void run()
 	{	
-		if(!Server.playersConnected)
+		if(!this.server.playersConnected)
 			checkClientCount();
 		try
 		{
@@ -99,12 +102,12 @@ public class ClientHandler extends Thread {
 				Object recievedObject = in.readObject();
 
 				// Teams (strings) responsible for starting the game
-				if(!Server.gameStarted)
+				if(!this.server.gameStarted)
 				{
 					
 					String request = (String) recievedObject;
 					// There is no 2 player - we process on request
-					if(Server.players.size() < 2)
+					if(this.server.players.size() < 2)
 					{
 						if(request.contains("nextPlayer"))
 						{
@@ -112,7 +115,7 @@ public class ClientHandler extends Thread {
 							try
 							{
 								Player currentPlayer = (Player) in.readObject();
-								Server.players.add(currentPlayer);
+								this.server.players.add(currentPlayer);
 								System.out.println("New player: " + currentPlayer.getPlayerName());
 								checkPlayerCount();
 							}
@@ -131,7 +134,7 @@ public class ClientHandler extends Thread {
 					System.out.println("New shot: (" + shot.getX() + ", " + shot.getY() + ")");
 					
 					// Logic
-					Message response = Server.processShot(shot);
+					Message response = this.server.processShot(shot);
 					broadcast(response);
 					
 					if(response.isVictory())

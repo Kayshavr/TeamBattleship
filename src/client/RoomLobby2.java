@@ -1,2 +1,4 @@
-package client;public class RoomLobby2 {
+package client;
+
+public class RoomLobby2 {
 }
