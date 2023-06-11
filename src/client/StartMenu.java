@@ -35,8 +35,7 @@ public class StartMenu extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Join room");
-                JoinRoom joinRoom = new JoinRoom();
-                joinRoom.setVisible(true);
+                Client client = new Client();
                 dispose();
             }
         });

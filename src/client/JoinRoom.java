@@ -7,11 +7,11 @@ import java.awt.event.ActionListener;
 
 public class JoinRoom extends JFrame {
     private JTextField nameTextField;
-    private JTextField ipAddressField;
+    private JTextField roomNumberField;
     private JLabel titleLabel;
     private JPanel centerPanel;
     private JLabel nameLabel;
-    private JLabel ipAddressLabel;
+    private JLabel roomNumberLabel;
     private JPanel bottomPanel;
     private JButton joinButton;
     private JButton backButton;
@@ -35,10 +35,10 @@ public class JoinRoom extends JFrame {
         nameLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         nameTextField = new JTextField(15);
         nameTextField.setFont(new Font("Arial", Font.PLAIN, 16));
-        ipAddressLabel = new JLabel("IP Address:");
-        ipAddressLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        ipAddressField = new JTextField(15);
-        ipAddressField.setFont(new Font("Arial", Font.PLAIN, 16));
+        roomNumberLabel = new JLabel("Room Number:");
+        roomNumberLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        roomNumberField = new JTextField(15);
+        roomNumberField.setFont(new Font("Arial", Font.PLAIN, 16));
 
         centerPanel.add(nameLabel);
         centerPanel.add(nameTextField);
@@ -77,10 +77,10 @@ public class JoinRoom extends JFrame {
         centerPanel.add(nameTextField, g);
         g.gridx = 0;
         g.gridy = 2;
-        centerPanel.add(ipAddressLabel, g);
+        centerPanel.add(roomNumberLabel, g);
         g.gridx = 2;
         g.gridy = 2;
-        centerPanel.add(ipAddressField, g);
+        centerPanel.add(roomNumberField, g);
         g.gridx = 2;
         g.gridy = 4;
         centerPanel.add(joinButton, g);
