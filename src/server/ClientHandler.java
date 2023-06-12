@@ -116,6 +116,9 @@ public class ClientHandler extends Thread {
 //					this.server.resetServer();
 //					for resetting the server we need something like this
 				}
+				else if(recievedObject instanceof Message) {
+					broadcast(recievedObject);
+				}
 				// Teams (strings) responsible for starting the game
 				else if(!this.server.gameStarted)
 				{

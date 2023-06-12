@@ -84,7 +84,20 @@ public class ServerConnection extends Thread{
 			System.out.println("Error: " + e.getMessage());
 		}
 	}
-	
+
+	public void sendChatMsg(String msg) {
+		try {
+			Message msgObj= new Message();
+			msgObj.setChat(true);
+			msgObj.setContent(msg);
+
+			out.writeObject(msgObj);
+
+		} catch (IOException e) {
+			System.out.println("Error: " + e.getMessage());
+		}
+	}
+
 	public void run()
 	{
 		try
@@ -134,9 +147,12 @@ public class ServerConnection extends Thread{
 				else
 				{
 					message = (Message) recievedObject;
-					
-					// Process message
-					client.processMessage(message);
+					if(message.isChat()){
+						client.displayMessage(message.getContent());
+					}else {
+						// Process message
+						client.processMessage(message);
+					}
 				}
 
 			}

@@ -9,7 +9,9 @@ public class Message implements java.io.Serializable{
 	private String nextTurn;
 	private Shot shot;
 	private Ship Ship;
-	
+	private boolean chat = false;
+	private String content = null;
+
 	public Message() {
 	}
 
@@ -60,5 +62,8 @@ public class Message implements java.io.Serializable{
 	public void setShip(Ship ship) {
 		Ship = ship;
 	}
-
+	public void setChat(boolean chat) {this.chat = chat;}
+	public boolean isChat() {return chat;}
+	public void setContent(String content) {this.content = content;}
+	public String getContent() {return content;}
 }

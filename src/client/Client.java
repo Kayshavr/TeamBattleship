@@ -387,6 +387,19 @@ public class Client {
 //		serverCon.closeConnection();
 		System.exit(0);
 	}
+
+	//this function is used to send the message retrieve after send button is clicked
+	public void sendMessage (String msg) {
+		String name = player.getPlayerName();
+		msg = name + ": " + msg;
+		serverCon.sendChatMsg(msg);
+	}
+
+	public void displayMessage (String msg) {
+		System.out.println(msg);
+		// swing code to display in the Jframe
+	}
+
 	public static void main(String[] args) {
 //		new Client();
 	}
