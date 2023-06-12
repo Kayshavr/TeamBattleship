@@ -3,7 +3,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import model.Message;
 import model.Player;
@@ -32,12 +31,12 @@ public class Server extends Thread {
 			System.out.println("Server running. Waiting for connections...");
 
 			try {
-				// Gaida klientu savienojumus
+				// Waiting for client connections
 				while (true) {
 					Socket client = listener.accept();
 					System.out.println("New client connected");
 
-					// Izveido un saak clientHandler thread
+					// Creates and calls the clientHandler thread
 					ClientHandler clientThread = new ClientHandler(client, this);
 					clients.add(clientThread);
 					clientThread.start();
@@ -106,26 +105,17 @@ public class Server extends Thread {
 
 	public void main(String[] args) throws IOException {
 		this.PORT  = 8989;
-		// Ja nav noradits porta nr. tad uzstada default port.
-		if(args.length < 1)
-			this.PORT = 8989;
-		else
-			this.PORT = Integer.parseInt(args[0]);
-		
-		
-		
+
 		ServerSocket listener = new ServerSocket(this.PORT);
 		System.out.println("Server running. Waiting for connections...");
 		
 		try
 		{
-			// Gaida klientu savienojumus
 			while(true)
 			{
 				Socket client = listener.accept();
 				System.out.println("New client connected");
-				
-				// Izveido un saak clientHandler thread
+
 				ClientHandler clientThread = new ClientHandler(client, this);
 				clients.add(clientThread);
 				clientThread.start();

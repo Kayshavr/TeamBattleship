@@ -29,16 +29,6 @@ public class Client {
 	private JLabel descriptionLabel;
 	private JLabel infoBox;
 	private JLabel currentTurnLabel;
-	private JTextField nameTextField;
-	private JTextField roomNumberField;
-	private JLabel titleLabel;
-	private JPanel centerPanel;
-	private JLabel nameLabel;
-	private JLabel roomNumberLabel;
-	private JPanel bottomPanel;
-	private JButton joinButton;
-	private JButton backButton;
-
 	private int[][] playerShips;
 	private Player player;
 	private String lastTurn;

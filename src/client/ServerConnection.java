@@ -100,7 +100,7 @@ public class ServerConnection extends Thread{
 					String serverResponse = (String) recievedObject;
 					System.out.println("[SERVER]: " + serverResponse);
 
-					// Ja visi lietotaji nav pieslegusies - atvert gaidisanas ekranu
+					// If all users are not logged in - open the standby screen
 					if(!playersConnected)
 					{
 						if(serverResponse.equals("wait"))
@@ -114,9 +114,8 @@ public class ServerConnection extends Thread{
 							
 						}
 					}
-					
-					// Ja visi lietotaji pieslegusies, visi speletaji nav gatavi, tacu mes esam gatavi
-					// atvert gaidisanas ekranu
+
+					// If all users are logged in, wait for Server Ready
 					if(playersConnected && !playersReady && ready)
 					{
 						if(serverResponse.equals("wait"))

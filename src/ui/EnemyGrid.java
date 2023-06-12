@@ -93,7 +93,7 @@ public class EnemyGrid extends JPanel{
 		int endIndexRow;
 		int endIndexCol;
 				
-		// Calcualtes bounding box coordinates
+		// Calculates bounding box coordinates
 		if(rotation == 1)
 		{
 			startIndexRow = (row - 1 < 0) ? 0 : row - 1;
