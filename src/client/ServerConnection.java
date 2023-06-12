@@ -76,6 +76,14 @@ public class ServerConnection extends Thread{
 			System.out.println("Error sending Player object: " + e.getMessage());
 		}
 	}
+
+	public void quit() {
+		try {
+			out.writeObject("clientQuit");
+		} catch (IOException e) {
+			System.out.println("Error: " + e.getMessage());
+		}
+	}
 	
 	public void run()
 	{
@@ -84,8 +92,10 @@ public class ServerConnection extends Thread{
 			while(true)
 			{
 				Object recievedObject = in.readObject();
-				
-				if(!gameStarted)
+				if(recievedObject.toString().contains("end")){
+					client.exit();
+				}
+				else if(!gameStarted)
 				{
 					String serverResponse = (String) recievedObject;
 					System.out.println("[SERVER]: " + serverResponse);

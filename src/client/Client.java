@@ -1,5 +1,7 @@
 package client;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -206,6 +208,17 @@ public class Client {
 			serverCon = new ServerConnection(socket, player, this);
 			serverCon.start();
 
+			frame.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent e) {
+					// Interrupt the ServerConnection thread
+					serverCon.quit();
+					// Close the frame and exit the application
+					frame.dispose();
+					System.exit(0);
+				}
+			});
+
 		}
 		catch(IOException ex)
 		{
@@ -337,9 +350,17 @@ public class Client {
 		JOptionPane.showMessageDialog(frame,"Player: " + winner + " has won.");
 		frame.dispose();
 		serverCon.closeConnection();
-		System.exit(0);		
+		//if the server is to be reset we need to something here as well
+		System.exit(0);
 	}
 
+	public void exit()
+	{
+//		frame.dispose();
+//		serverCon.interrupt();
+//		serverCon.closeConnection();
+		System.exit(0);
+	}
 	public static void main(String[] args) {
 //		new Client();
 	}
