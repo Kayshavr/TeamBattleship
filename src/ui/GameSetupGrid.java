@@ -63,7 +63,7 @@ public class GameSetupGrid extends JPanel{
         }
 	}
 
-	// Funkcijas kugu zimesanai
+	// Draw ship placement preview
 	public Vector<Point> drawShipPreview(int row, int col)
 	{
 		Vector<Point> pointsToDraw = new Vector<Point>();
@@ -170,7 +170,7 @@ public class GameSetupGrid extends JPanel{
 		
 		Vector<Point> newShip = new Vector<Point>();
 		
-		// Calcualtes bounding box coordinates
+		// Calculate bounding box coordinates
 		if(rotation == 1)
 		{
 			startIndexRow = (row - 1 < 0) ? 0 : row - 1;
@@ -198,7 +198,6 @@ public class GameSetupGrid extends JPanel{
 			for (int j = startIndexCol; j <= endIndexCol; j++) {
 
 //				System.out.print(i + ":" + j + " ");
-				// Parbauda vai punkts nav jaunajam kugim
 				if(newShip.contains(new Point(j, i)))
 				{
 //					System.out.print("SHIP POINT");
@@ -266,8 +265,7 @@ class SetupCell extends JPanel{
 //		this.row = row;
 //		this.col = col;
 		this.status = 0;
-		
-    	// TODO: Function for reset colour to normal
+
 		setBackground(new Color(158, 216, 240));            
     	setBorder(new MatteBorder(1, 1, 1, 1, new Color(79, 183, 227)));
         setPreferredSize(new Dimension(50, 50));

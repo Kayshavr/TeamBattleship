@@ -110,10 +110,10 @@ public class ServerConnection extends Thread{
 				}
 				else if(!gameStarted)
 				{
-					String serverResponse = (String) recievedObject;
+					String serverResponse = recievedObject.toString();
 					System.out.println("[SERVER]: " + serverResponse);
 
-					// Ja visi lietotaji nav pieslegusies - atvert gaidisanas ekranu
+					//If all users are not logged in - open waiting panel
 					if(!playersConnected)
 					{
 						if(serverResponse.equals("wait"))
@@ -127,9 +127,8 @@ public class ServerConnection extends Thread{
 							
 						}
 					}
-					
-					// Ja visi lietotaji pieslegusies, visi speletaji nav gatavi, tacu mes esam gatavi
-					// atvert gaidisanas ekranu
+
+					// Wait for players to be ready
 					if(playersConnected && !playersReady && ready)
 					{
 						if(serverResponse.equals("wait"))
@@ -148,6 +147,7 @@ public class ServerConnection extends Thread{
 				{
 					message = (Message) recievedObject;
 					if(message.isChat()){
+						// Chat Message
 						client.displayMessage(message.getContent());
 					}else {
 						// Process message

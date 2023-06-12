@@ -1,10 +1,14 @@
 package client;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.Socket;
 import java.sql.*;
+import java.util.ArrayList;
+
 import ConnectionToDatabase.Cnx;
 
 import javax.swing.*;
@@ -22,6 +26,7 @@ public class Client {
 	private JFrame frame;
 	private JFrame waitFrame;
 	private JPanel waitPanel;
+	private JPanel messagePanel;
 	private JPanel shipSelectPanel;
 	private JPanel gamePanel;
 
@@ -29,19 +34,11 @@ public class Client {
 	private JLabel descriptionLabel;
 	private JLabel infoBox;
 	private JLabel currentTurnLabel;
-	private JTextField nameTextField;
-	private JTextField roomNumberField;
-	private JLabel titleLabel;
-	private JPanel centerPanel;
-	private JLabel nameLabel;
-	private JLabel roomNumberLabel;
-	private JPanel bottomPanel;
-	private JButton joinButton;
-	private JButton backButton;
 
 	private int[][] playerShips;
 	private Player player;
 	private String lastTurn;
+	private DefaultListModel<String> listModel;
 	
 	private PlayerGrid playerGrid;
 	private EnemyGrid enemyGrid;
@@ -91,6 +88,59 @@ public class Client {
 				System.exit(0);
 			}
 		});
+
+		// Create the scroll pane and list
+		JList<String> messageList = new JList<>();
+		listModel = new DefaultListModel<>();
+		messageList.setModel(listModel);
+		JScrollPane scrollPane = new JScrollPane(messageList);
+
+		// Create the text box and submit button
+		JTextField textField = new JTextField();
+		JButton submitButton = new JButton("Submit");
+		submitButton.setBackground(Color.WHITE);
+
+		// Add a hover effect to the submit button
+		submitButton.addMouseListener(new java.awt.event.MouseAdapter() {
+			public void mouseEntered(java.awt.event.MouseEvent evt) {
+				submitButton.setBackground(Color.LIGHT_GRAY);
+			}
+
+			public void mouseExited(java.awt.event.MouseEvent evt) {
+				submitButton.setBackground(Color.WHITE);
+			}
+		});
+
+		// Add an action listener to the submit button
+		submitButton.addActionListener(e -> {
+			String message = textField.getText();
+			if (!message.isEmpty()) {
+				sendMessage(message);
+				textField.setText("");
+			}
+		});
+
+		// Create a panel for the text box and submit button
+		JPanel inputPanel = new JPanel(new BorderLayout());
+		inputPanel.setBackground(Color.GRAY);
+		inputPanel.add(textField, BorderLayout.CENTER);
+		inputPanel.add(submitButton, BorderLayout.EAST);
+
+		messagePanel = new JPanel();
+		messagePanel.setLayout(new BorderLayout());
+		messagePanel.setBackground(new Color(158, 216, 240));
+
+		messagePanel.add(scrollPane, BorderLayout.CENTER);
+		messagePanel.add(inputPanel, BorderLayout.SOUTH);
+
+
+		// Display the JFrame
+
+//		add(scrollPane, BorderLayout.CENTER);
+//		add(inputPanel, BorderLayout.SOUTH);
+//		setVisible(true);
+
+
 		// Creates an empty grid for user
         playerShips = new int[10][10];
         for (int i = 0; i < playerShips.length; i++) {
@@ -121,7 +171,7 @@ public class Client {
 		{
 			frame.setMinimumSize(new Dimension(300, 200));
 
-			// Continue buttton pressed
+			// Continue button pressed
 			
 			player.setPlayerField(setupGrid.returnField());
 			player.setPlayerShips(setupGrid.getShips());
@@ -181,6 +231,7 @@ public class Client {
 			frame.setTitle("[" + player.getPlayerName() + "] " + "Battleships - Playing on: " + host);
 			frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 			frame.add(gamePanel, BorderLayout.CENTER);
+			frame.add(messagePanel, BorderLayout.SOUTH);
 		});
         
         gbc2.insets = new Insets(5,50,5,50);
@@ -243,6 +294,7 @@ public class Client {
 		finally
 		{
 			frame.setMinimumSize(new Dimension(1400, 1000));
+			frame.setBackground(new Color(158, 216, 240));
 			frame.setTitle("[" + player.getPlayerName() + "] Ship setup");
 			frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 			frame.add(shipSelectPanel, BorderLayout.CENTER);
@@ -389,15 +441,16 @@ public class Client {
 	}
 
 	//this function is used to send the message retrieve after send button is clicked
-	public void sendMessage (String msg) {
+	public void sendMessage(String msg) {
 		String name = player.getPlayerName();
 		msg = name + ": " + msg;
 		serverCon.sendChatMsg(msg);
 	}
 
-	public void displayMessage (String msg) {
-		System.out.println(msg);
+	public void displayMessage(String msg) {
+		System.out.println("Incoming Message: " +msg);
 		// swing code to display in the Jframe
+		listModel.addElement(msg);
 	}
 
 	public static void main(String[] args) {

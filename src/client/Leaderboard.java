@@ -20,7 +20,6 @@ public class Leaderboard{
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
 
-
         // Create the scrollable pane
         JScrollPane scrollPane = new JScrollPane();
 
