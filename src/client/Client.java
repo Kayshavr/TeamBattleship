@@ -53,118 +53,14 @@ public class Client {
 	private int misses = 0;
 	private int shipsLeft = 10;
 	
-	public Client() {
+	public Client(String hostInput, String portInput, String nameInput) {
+		host = hostInput;
+		port = portInput;
+		name = nameInput;
 
-		titleLabel = new JLabel("Join a new room.");
-		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
-
-		centerPanel = new JPanel();
-		centerPanel.setLayout(new GridBagLayout());
-		centerPanel.setBackground(new Color(158, 216, 240));
-		GridBagConstraints g = new GridBagConstraints();
-
-		nameLabel = new JLabel("Name:");
-		nameLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-		nameTextField = new JTextField(15);
-		nameTextField.setFont(new Font("Arial", Font.PLAIN, 16));
-		roomNumberLabel = new JLabel("Room Number:");
-		roomNumberLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-		roomNumberField = new JTextField(15);
-		roomNumberField.setFont(new Font("Arial", Font.PLAIN, 16));
-
-		centerPanel.add(nameLabel);
-		centerPanel.add(nameTextField);
-
-		bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		bottomPanel.setBackground(new Color(158, 216, 240));
-
-		backButton = new JButton("Back");
-
-		// Connection panel
-
-		joinButton = new JButton("Connect!");
-		joinButton.addActionListener(e ->
-		{
-			String hostInput = "localhost";
-			String roomNumber = roomNumberField.getText();
-			int portInput = Integer.parseInt(roomNumber) + 9000;
-			String nameInput = nameTextField.getText();
-			if(hostInput != null && !hostInput.isBlank() && roomNumber != null && !roomNumber.isBlank() && nameInput != null && !nameInput.isBlank())
-			{
-				host = hostInput;
-				port = Integer.toString(portInput);
-				name = nameInput;
-				System.out.println("Host: " + host);
-				System.out.println("Port: " + port);
-				System.out.println("Name: " + name);
-
-				titleLabel.setVisible(false);
-				centerPanel.setVisible(false);
-				bottomPanel.setVisible(false);
-
-				player = new Player(nameInput);
-				
-				// Sak savienojumu ar serveri
-				try
-				{
-					socket = new Socket(host, Integer.parseInt(port));
-					serverCon = new ServerConnection(socket, player, this);
-					serverCon.start();
-					
-				}
-				catch(IOException ex)
-				{
-					System.out.println("Error connection to server " + ex.getMessage());
-					JOptionPane.showMessageDialog(frame, "Error connecting to server");
-					frame.dispose();
-					System.exit(1);
-					
-				}
-				finally
-				{
-					frame.setMinimumSize(new Dimension(1400, 1000));
-					frame.setTitle("[" + player.getPlayerName() + "] Ship setup");
-					frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-					frame.add(shipSelectPanel, BorderLayout.CENTER);
-				}				
-			}
-			else
-			{
-				JOptionPane.showMessageDialog(frame, "Host/port/name cannot be left blank.");
-			}
-		});
-
-		backButton.addActionListener(e ->
-		{
-			System.out.println("Back");
-			StartMenu startMenu = new StartMenu();
-			startMenu.setVisible(true);
-			frame.dispose();
-		});
-        
-		// Izkartojuma definicijas
-		g.insets = new Insets(5,5,5,5);
-		g.fill = GridBagConstraints.VERTICAL;
-		g.gridwidth = 2;
-		g.gridx = 0;
-		g.gridy = 1;
-		centerPanel.add(nameLabel, g);
-		g.gridx = 2;
-		g.gridy = 1;
-		centerPanel.add(nameTextField, g);
-		g.gridx = 0;
-		g.gridy = 2;
-		centerPanel.add(roomNumberLabel, g);
-		g.gridx = 2;
-		g.gridy = 2;
-		centerPanel.add(roomNumberField, g);
-		g.gridx = 2;
-		g.gridy = 4;
-		centerPanel.add(joinButton, g);
-		bottomPanel.add(backButton);
+		player = new Player(nameInput);
       
-        // Gaidisanas panelis
+        // Waiting panel
 		waitFrame = new JFrame("Waiting for other player...");		
 		waitPanel = new JPanel();
 		
@@ -181,7 +77,7 @@ public class Client {
 		waitFrame.pack();
 		
 		
-		// Izveido tuksu lietotaja laukumu
+		// Creates an empty grid for user
         playerShips = new int[10][10];
         for (int i = 0; i < playerShips.length; i++) {
 			for (int j = 0; j < playerShips[i].length; j++) {
@@ -189,7 +85,7 @@ public class Client {
 			}
 		}
 
-        // Laukuma uzstadisana
+        // Battlefield construction
         GameSetupGrid setupGrid = new GameSetupGrid(this);
 	    
         shipSelectPanel = new JPanel();
@@ -210,6 +106,7 @@ public class Client {
         continueButton.addActionListener(e ->
 		{
 			frame.setMinimumSize(new Dimension(300, 200));
+
 			// Continue buttton pressed
 			
 			player.setPlayerField(setupGrid.returnField());
@@ -218,7 +115,7 @@ public class Client {
 			playerGrid = new PlayerGrid(player.getPlayerField());
 			enemyGrid = new EnemyGrid(serverCon);
 			
-			// Nosutam serverim savus speles datus
+			// Send game data to the server
 			serverCon.sendPlayerObject();
 			serverCon.setReady(true);
 	        
@@ -290,23 +187,42 @@ public class Client {
         // Setup Game panel
         gamePanel = new JPanel();
         gamePanel.setLayout(new GridBagLayout());
-
- 
         
-        frame = new JFrame("Connect to server");
-		frame.setTitle("Join Room");
+        frame = new JFrame("Game Room");
+		frame.setTitle("Game Room");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setBackground(new Color(158, 216, 240));
 		frame.setLayout(new BorderLayout());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
         frame.setMinimumSize(new Dimension(400, 400));
-		frame.add(titleLabel, BorderLayout.NORTH);
-		frame.add(centerPanel, BorderLayout.CENTER);
-		frame.add(bottomPanel, BorderLayout.SOUTH);
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+		// Connection to server
+		try
+		{
+			socket = new Socket(host, Integer.parseInt(port));
+			serverCon = new ServerConnection(socket, player, this);
+			serverCon.start();
+
+		}
+		catch(IOException ex)
+		{
+			System.out.println("Error connection to server " + ex.getMessage());
+			JOptionPane.showMessageDialog(frame, "Error connecting to server");
+			frame.dispose();
+			System.exit(1);
+
+		}
+		finally
+		{
+			frame.setMinimumSize(new Dimension(1400, 1000));
+			frame.setTitle("[" + player.getPlayerName() + "] Ship setup");
+			frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+			frame.add(shipSelectPanel, BorderLayout.CENTER);
+		}
+
 	}
 	
 	public void editDescription(String newLabel)
@@ -425,6 +341,6 @@ public class Client {
 	}
 
 	public static void main(String[] args) {
-		new Client();
+//		new Client();
 	}
 }

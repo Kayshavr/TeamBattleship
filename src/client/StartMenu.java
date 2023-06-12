@@ -34,8 +34,11 @@ public class StartMenu extends JFrame {
         joinRoomButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+//                System.out.println("Join room");
+//                Client client = new Client();
+//                dispose();
                 System.out.println("Join room");
-                Client client = new Client();
+                JoinRoom joinRoom = new JoinRoom();
                 dispose();
             }
         });
@@ -45,7 +48,6 @@ public class StartMenu extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Create room");
                 CreateRoom createRoom = new CreateRoom();
-                createRoom.setVisible(true);
                 dispose();
             }
         });
