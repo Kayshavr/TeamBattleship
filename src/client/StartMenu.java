@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 public class StartMenu extends JFrame {
     private JButton joinRoomButton;
     private JButton createRoomButton;
+    private JButton leaderboardButton;
     private JButton quitButton;
     private JLabel battleshipTitle;
     private JPanel startMenuPanel;
@@ -29,6 +30,7 @@ public class StartMenu extends JFrame {
         battleshipTitle.setHorizontalAlignment(SwingConstants.CENTER);
         joinRoomButton = createButton("Join Room");
         createRoomButton = createButton("Create Room");
+        leaderboardButton = createButton("Leaderboard");
         quitButton = createButton("Quit");
 
         joinRoomButton.addActionListener(new ActionListener() {
@@ -48,6 +50,15 @@ public class StartMenu extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Create room");
                 CreateRoom createRoom = new CreateRoom();
+                dispose();
+            }
+        });
+
+        leaderboardButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("View Leaderboard");
+                Leaderboard leaderboard = new Leaderboard();
                 dispose();
             }
         });
@@ -72,7 +83,10 @@ public class StartMenu extends JFrame {
         g.gridy = 2;
         startMenuPanel.add(createRoomButton, g);
         g.gridx = 1;
-        g.gridy = 4;
+        g.gridy = 3;
+        startMenuPanel.add(leaderboardButton, g);
+        g.gridx = 1;
+        g.gridy = 5;
         startMenuPanel.add(quitButton, g);
 
         add(startMenuPanel, BorderLayout.CENTER);
