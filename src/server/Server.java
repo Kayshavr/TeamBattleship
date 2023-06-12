@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import model.Message;
 import model.Player;
@@ -10,24 +11,24 @@ import model.Shot;
 
 public class Server extends Thread {
 	private int PORT;
-	
+	private ServerSocket listener;
 	public ArrayList<ClientHandler> clients = new ArrayList<>();
 	public ArrayList<Player> players = new ArrayList<>();
 	
 	public Player currentTurn;
 	public boolean gameStarted = false;
 	public boolean playersConnected = false;
+
 	
 	public Server(int PORT) throws IOException {
 		this.PORT = PORT;
-
 	}
 
 	@Override
 	public void run(){
 
 		try {
-			ServerSocket listener = new ServerSocket(this.PORT);
+			listener = new ServerSocket(this.PORT);
 			System.out.println("Server running. Waiting for connections...");
 
 			try {
@@ -45,7 +46,15 @@ public class Server extends Thread {
 				listener.close();
 			}
 		}catch (IOException e){
-			System.out.println("Noooooo!");
+			System.out.println("Room disconnected!");
+		}
+	}
+
+	public void interrupt() {
+		try {
+			listener.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

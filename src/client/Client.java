@@ -4,6 +4,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.Socket;
+import java.sql.*;
+import ConnectionToDatabase.Cnx;
 
 import javax.swing.*;
 
@@ -47,20 +49,22 @@ public class Client {
 	private String host;
 	private String port;
 	private String name;
+	private int roomNumber;
 	private Socket socket;
 	private ServerConnection serverCon;
 	
 	// Stats
 	private int hits = 0;
 	private int misses = 0;
-	private int shipsLeft = 10;
+	private int shipsLeft = 4;
 	
-	public Client(String hostInput, String portInput, String nameInput) {
+	public Client(String hostInput, String portInput, String nameInput, int roomNumber) {
 		host = hostInput;
 		port = portInput;
 		name = nameInput;
+		this.roomNumber = roomNumber;
 
-		player = new Player(nameInput);
+		player = new Player(name);
       
         // Waiting panel
 		waitFrame = new JFrame("Waiting for other player...");		
@@ -77,8 +81,16 @@ public class Client {
 		waitFrame.setMinimumSize(new Dimension(500, 100));
 		waitFrame.add(waitPanel, BorderLayout.CENTER);
 		waitFrame.pack();
-		
-		
+		waitFrame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				// Interrupt the ServerConnection thread
+				serverCon.quit();
+				// Close the frame and exit the application
+				waitFrame.dispose();
+				System.exit(0);
+			}
+		});
 		// Creates an empty grid for user
         playerShips = new int[10][10];
         for (int i = 0; i < playerShips.length; i++) {
@@ -320,7 +332,7 @@ public class Client {
 		
 		
 		if(message.isVictory())
-			declareWinner(lastTurn);
+			declareWinner(lastTurn, hits, misses, shipsLeft);
 			
 		
 		lastTurn = message.getNextTurn();
@@ -344,8 +356,22 @@ public class Client {
 	}
 	
 	
-	public void declareWinner(String winner)
+	public void declareWinner(String winner, int hits, int misses, int shipsLeft)
 	{
+		int score = ((hits*10 - misses*2) * (4 - shipsLeft))*100;
+		try {
+			Cnx connectionClass = new Cnx(); //create connection
+			Connection connection = connectionClass.getConnection(); //create connection
+			Statement st = connection.createStatement();
+
+			String query1 = "INSERT INTO user_tbl (username,gameRoom,score) VALUES ('"+name+"',"+roomNumber+","+score+")";
+			st.executeUpdate(query1);
+
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+
+
 		//Close the connection and open the message box
 		JOptionPane.showMessageDialog(frame,"Player: " + winner + " has won.");
 		frame.dispose();

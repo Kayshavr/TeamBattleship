@@ -99,7 +99,7 @@ public class CreateRoom{
                                 bottomPanel.setVisible(false);
                                 frame.dispose();
 
-                                Client client = new Client(hostInput, Integer.toString(portNumber), nameInput);
+                                Client client = new Client(hostInput, Integer.toString(portNumber), nameInput, roomNumber);
 
 
                             } else {

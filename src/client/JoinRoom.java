@@ -89,7 +89,7 @@ public class JoinRoom{
                                 bottomPanel.setVisible(false);
                                 frame.dispose();
 
-                                Client client = new Client(hostInput, Integer.toString(portInput), nameInput);
+                                Client client = new Client(hostInput, Integer.toString(portInput), nameInput, Integer.parseInt(roomNumber));
                             }else{
                                 JOptionPane.showMessageDialog(frame, "Room is full!!! Please join or create another room.");
                             }

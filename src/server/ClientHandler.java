@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.sql.*;
+import ConnectionToDatabase.Cnx;
 
 import model.Message;
 import model.Player;
@@ -103,6 +105,14 @@ public class ClientHandler extends Thread {
 
 				if(recievedObject.toString().contains("clientQuit")){
 					broadcast("end");
+					Cnx connectionClass = new Cnx(); //create connection
+					Connection connection = connectionClass.getConnection(); //create connection
+					Statement st = connection.createStatement();
+					//Update Room state
+					String newRoomState = "exited";
+					System.out.println("Port Number: " + client.getLocalPort() + " Closed");
+					String query3 = "UPDATE room_tbl SET roomState='"+newRoomState+"' WHERE portNumber="+client.getLocalPort();
+					st.executeUpdate(query3);
 //					this.server.resetServer();
 //					for resetting the server we need something like this
 				}
@@ -144,10 +154,17 @@ public class ClientHandler extends Thread {
 					
 					if(response.isVictory())
 					{
+						Cnx connectionClass = new Cnx(); //create connection
+						Connection connection = connectionClass.getConnection(); //create connection
+						Statement st = connection.createStatement();
+						//Update Room state
+						String newRoomState = "finished";
+						System.out.println("Port Number: " + client.getLocalPort() + " Closed");
+						String query3 = "UPDATE room_tbl SET roomState='"+newRoomState+"' WHERE portNumber="+client.getLocalPort();
+						st.executeUpdate(query3);
 						in.close();
 						out.close();
 						client.close();
-						System.exit(0);
 					}
 				}				
 			}
@@ -155,8 +172,9 @@ public class ClientHandler extends Thread {
 		catch(IOException | ClassNotFoundException e)
 		{
 			System.out.println("Error parsing request " + e.getMessage());
-		}
-		finally
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		} finally
 		{
 			// When the server is shut down - we close it
 			try

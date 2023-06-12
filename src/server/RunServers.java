@@ -31,6 +31,7 @@ public class RunServers {
         int roomNumber = room.getRoomNumber();
         if(servers[roomNumber].isAlive()){
             System.out.println("Server is Alive!!");
+            servers[roomNumber].interrupt();
         }
         else{
             System.out.println("Server is stopped");
@@ -116,11 +117,9 @@ public class RunServers {
                         System.out.println("Room Number " + Integer.toString(roomNumber) + " is running!");
                     } else if (roomState.equals("finished")) {
                         //Close Room
-                        System.out.println("Close Room");
                         serverStop(room, st);
                     } else if (roomState.equals("exited")) {
                         //Close Room
-                        System.out.println("Close Room");
                         serverStop(room, st);
                     }
                 }
