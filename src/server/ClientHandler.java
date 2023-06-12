@@ -101,8 +101,13 @@ public class ClientHandler extends Thread {
 			{
 				Object recievedObject = in.readObject();
 
+				if(recievedObject.toString().contains("clientQuit")){
+					broadcast("end");
+//					this.server.resetServer();
+//					for resetting the server we need something like this
+				}
 				// Teams (strings) responsible for starting the game
-				if(!this.server.gameStarted)
+				else if(!this.server.gameStarted)
 				{
 					
 					String request = (String) recievedObject;

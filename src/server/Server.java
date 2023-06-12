@@ -127,4 +127,26 @@ public class Server extends Thread {
 			listener.close();
 		}
 	}
+
+	public void resetServer()
+	{
+//		currentTurn = null;
+//		gameStarted = false;
+//		playersConnected = false;
+//		players.clear();
+//
+//		for (ClientHandler clientHandler : clients) {
+//			try {
+//				clientHandler.interrupt();
+//				clientHandler.in.close();
+//				clientHandler.out.close();
+//				clientHandler.client.close();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//
+//		clients.clear();
+
+	}
 }
