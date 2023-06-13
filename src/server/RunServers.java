@@ -124,7 +124,7 @@ public class RunServers {
                     }
                 }
                 connection.close();
-                sleep(2000);
+                sleep(1000);
 
             } catch (SQLException e) {
                 System.out.println("SQL error!");

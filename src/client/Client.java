@@ -199,6 +199,7 @@ public class Client {
 	        enemyFieldLabel.setHorizontalAlignment(SwingConstants.CENTER);
 	        
 	        infoBox = new JLabel("");
+			infoBox.setText("Hits: 0 misses: 0 accuracy: 0% Enemy ships left: 4");
 	        infoBox.setFont(new Font("Verdana", Font.PLAIN, 24));
 	        infoBox.setHorizontalAlignment(SwingConstants.CENTER);
 	        
