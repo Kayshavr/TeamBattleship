@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 import ConnectionToDatabase.Cnx;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class CreateRoom{
     private JFrame frame;
@@ -63,52 +65,71 @@ public class CreateRoom{
 
                     //Create a game room and return
                     System.out.println("Connecting to Server...");
-                    try {
-                        Cnx connectionClass = new Cnx(); //create connection
-                        Connection connection = connectionClass.getConnection(); //create connection
-                        Statement st = connection.createStatement();
 
-                        String query1 = "SELECT (roomNumber),(portNumber) FROM room_tbl WHERE roomState='idle'";
-                        ResultSet result1 = st.executeQuery(query1); //execute query
-                        result1.next();
-                        int roomNumber = result1.getInt("roomNumber");
-                        int portNumber = result1.getInt("portNumber");
+                    CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
+                            String response = "No";
+                            try {
+                                Cnx connectionClass = new Cnx(); //create connection
+                                Connection connection = connectionClass.getConnection(); //create connection
+                                Statement st = connection.createStatement();
 
-                        String query2 = "UPDATE room_tbl SET roomState='create' WHERE portNumber="+portNumber;
-                        st.executeUpdate(query2);
+                                String query1 = "SELECT (roomNumber),(portNumber) FROM room_tbl WHERE roomState='idle'";
+                                ResultSet result1 = st.executeQuery(query1); //execute query
+                                result1.next();
+                                int roomNumber = result1.getInt("roomNumber");
+                                int portNumber = result1.getInt("portNumber");
 
-                        boolean created = false;
-                        while(!created) {
-                            String query3 = "SELECT roomState FROM room_tbl WHERE portNumber="+portNumber;
-                            ResultSet result2 = st.executeQuery(query3); //execute query
-                            result2.next();
-                            String roomState = result2.getString("roomState");
-                            if (roomState.equals("running")) {
-                                JOptionPane.showMessageDialog(frame, "Game room has been created!!! Your room number is: "+ roomNumber);
-                                created = true;
-                                System.out.println("Room is created");
-                                System.out.println("Connected to Game Room " + roomNumber);
+                                String query2 = "UPDATE room_tbl SET roomState='create' WHERE portNumber="+portNumber;
+                                st.executeUpdate(query2);
 
-                                //Update Player Number
-                                int roomPlayerCount = 1;
-                                String query4 = "UPDATE room_tbl SET roomPlayerCount='" + roomPlayerCount + "' WHERE portNumber=" + portNumber;
-                                st.executeUpdate(query4);
+                                boolean created = false;
+                                while(!created) {
+                                    String query3 = "SELECT roomState FROM room_tbl WHERE portNumber="+portNumber;
+                                    ResultSet result2 = st.executeQuery(query3); //execute query
+                                    result2.next();
+                                    String roomState = result2.getString("roomState");
+                                    if (roomState.equals("running")) {
+                                        created = true;
+                                        System.out.println("Room is created");
+                                        System.out.println("Connected to Game Room " + roomNumber);
 
-                                titleLabel.setVisible(false);
-                                centerPanel.setVisible(false);
-                                bottomPanel.setVisible(false);
-                                frame.dispose();
+                                        //Update Player Number
+                                        int roomPlayerCount = 1;
+                                        String query4 = "UPDATE room_tbl SET roomPlayerCount='" + roomPlayerCount + "' WHERE portNumber=" + portNumber;
+                                        st.executeUpdate(query4);
+                                        response = Integer.toString(portNumber) + "," + Integer.toString(roomNumber);
+                                        return response;
 
-                                Client client = new Client(hostInput, Integer.toString(portNumber), nameInput, roomNumber);
+                                    } else {
+                                        System.out.println("Waiting for room creation...");
+                                    }
+                                }
 
-
-                            } else {
-                                System.out.println("Waiting for room creation...");
+                            } catch (SQLException ex) {
+                                throw new RuntimeException(ex);
                             }
+                        return response;
+                    });
+
+                    try {
+                        String result = completableFuture.get();  // Wait for the completable future to complete and get the value
+                        if (result.equals("No")){
+                            JOptionPane.showMessageDialog(frame, "Cannot connect");
+                        }else{
+                            String[] results = result.split(",");
+                            String portNumber = results[0];
+                            String roomNumber = results[1];
+                            JOptionPane.showMessageDialog(frame, "Game room has been created!!! Your room number is: "+ roomNumber);
+                            titleLabel.setVisible(false);
+                            centerPanel.setVisible(false);
+                            bottomPanel.setVisible(false);
+                            frame.dispose();
+
+                            Client client = new Client(hostInput, portNumber, nameInput, Integer.parseInt(roomNumber));
                         }
 
-                    } catch (SQLException ex) {
-                        throw new RuntimeException(ex);
+                    } catch (InterruptedException | ExecutionException f) {
+                        f.printStackTrace();
                     }
 
                 }
