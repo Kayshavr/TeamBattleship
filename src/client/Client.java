@@ -172,7 +172,8 @@ public class Client {
 			frame.setMinimumSize(new Dimension(300, 200));
 
 			// Continue button pressed
-			
+
+			// Game Started
 			player.setPlayerField(setupGrid.returnField());
 			player.setPlayerShips(setupGrid.getShips());
 			

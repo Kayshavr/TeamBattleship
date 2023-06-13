@@ -6,6 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 import ConnectionToDatabase.Cnx;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
 
 public class JoinRoom{
     private JFrame frame;
@@ -62,44 +65,71 @@ public class JoinRoom{
                 if(roomNumber != null && !roomNumber.isBlank() && nameInput != null && !nameInput.isBlank())
                 {
                     System.out.println("Connecting to Server...");
-                    try {
-                        Cnx connectionClass = new Cnx(); //create connection
-                        Connection connection = connectionClass.getConnection(); //create connection
-                        Statement st = connection.createStatement();
 
-                        String query1 = "SELECT (roomState),(roomPlayerCount) FROM room_tbl WHERE portNumber='"+ Integer.toString(portInput) +"'";
+                    CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
+                        String response = "No";
+                        try {
+                            Cnx connectionClass = new Cnx(); //create connection
+                            Connection connection = connectionClass.getConnection(); //create connection
+                            Statement st = connection.createStatement();
 
-                        ResultSet result1 = st.executeQuery(query1); //execute query
-                        result1.next();
-                        String roomState = result1.getString("roomState");
-                        int roomPlayerCount = result1.getInt("roomPlayerCount");
+                            String query1 = "SELECT (roomState),(roomPlayerCount) FROM room_tbl WHERE portNumber='"+ Integer.toString(portInput) +"'";
 
-                        if(roomState.equals("running")){
-                            System.out.println("Room is available");
-                            if(roomPlayerCount < 2){
-                                System.out.println("Connected to Game Room " + roomNumber);
+                            ResultSet result1 = st.executeQuery(query1); //execute query
+                            result1.next();
+                            String roomState = result1.getString("roomState");
+                            int roomPlayerCount = result1.getInt("roomPlayerCount");
 
-                                //Update Player Number
-                                roomPlayerCount = roomPlayerCount +1;
-                                String query3 = "UPDATE room_tbl SET roomPlayerCount='"+roomPlayerCount+"' WHERE portNumber="+portInput;
-                                st.executeUpdate(query3);
+                            if(roomState.equals("running")){
+                                System.out.println("Room is available");
+                                if(roomPlayerCount < 2){
+                                    System.out.println("Connected to Game Room " + roomNumber);
 
-                                titleLabel.setVisible(false);
-                                centerPanel.setVisible(false);
-                                bottomPanel.setVisible(false);
-                                frame.dispose();
+                                    //Update Player Number
+                                    roomPlayerCount = roomPlayerCount +1;
+                                    String query3 = "UPDATE room_tbl SET roomPlayerCount='"+roomPlayerCount+"' WHERE portNumber="+portInput;
+                                    st.executeUpdate(query3);
+                                    response = Integer.toString(portInput) + "," + roomNumber;
+                                    return response;
 
-                                Client client = new Client(hostInput, Integer.toString(portInput), nameInput, Integer.parseInt(roomNumber));
+                                }else{
+                                    response = "Room Full";
+                                    return response;
+                                }
+
                             }else{
-                                JOptionPane.showMessageDialog(frame, "Room is full!!! Please join or create another room.");
+                                response = "Not Running";
+                                return response;
                             }
 
-                        }else{
+                        } catch (SQLException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    });
+                    try {
+                        String result = completableFuture.get();  // Wait for the completable future to complete and get the value
+                        if (result.equals("No")){
+                            JOptionPane.showMessageDialog(frame, "Cannot connect");
+                        } else if (result.equals("Room Full")) {
+                            JOptionPane.showMessageDialog(frame, "Room is full!!! Please join or create another room.");
+
+                        }else if (result.equals("Not Running")) {
                             JOptionPane.showMessageDialog(frame, "Room has not been created!");
+                        }else{
+                            String[] results = result.split(",");
+                            String portNumber = results[0];
+                            String gameRoomNumber = results[1];
+
+                            titleLabel.setVisible(false);
+                            centerPanel.setVisible(false);
+                            bottomPanel.setVisible(false);
+                            frame.dispose();
+
+                            Client client = new Client(hostInput, portNumber, nameInput, Integer.parseInt(gameRoomNumber));
                         }
 
-                    } catch (SQLException ex) {
-                        throw new RuntimeException(ex);
+                    } catch (InterruptedException | ExecutionException f) {
+                        f.printStackTrace();
                     }
                 }
                 else
